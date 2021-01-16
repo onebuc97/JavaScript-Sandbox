@@ -1,130 +1,68 @@
-const form = document.getElementById('form');
-const username = document.getElementById('username');
-const email = document.getElementById('email');
-const password = document.getElementById('password');
-const password2 = document.getElementById('password2');
+const video = document.getElementById('video');
+const play = document.getElementById('play');
+const stop = document.getElementById('stop');
+const progress = document.getElementById('progress');
+const timestamp = document.getElementById('timestamp');
 
-// Show input error message
-function showError(input, message) {
-    const formControl = input.parentElement;
-    formControl.className = 'form-control error';
-    const small = formControl.querySelector('small');
-    small.innerText = message;
-}
 
-// Show success outline
-function showSuccess(input) {
-    const formControl = input.parentElement;
-    formControl.className = 'form-control success';
-}
-
-// Check email is valid
-function checkEmail(input) {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(re.test(input.value.trim())) {
-        showSuccess(input);
+// Play & pause video
+function toggleVideoStatus() {
+    if(video.paused) {
+        video.play();
     } else {
-        showError(input, 'Email is not valid');
+        video.pause();
     }
 }
 
-// Check Required Fields
-function checkRequired(inputArr) {
-    inputArr.forEach(function(input) {
-        if (input.value.trim() === '') {
-            showError(input, `${getFieldName(input)} is required`);
-        } else {
-            showSuccess(input);
-        }
-    });
-}
-
-// Check input length
-function checkLength(input, min, max) {
-    if(input.value.length < min) {
-        showError(input, `${getFieldName(input)} must be at least ${min} characters`);
-    } else if(input.value.length > max) {
-        showError(input, `${getFieldName(input)} must be less than ${max} characters`);
+// update play/pause icon
+function updatePlayIcon() {
+    if(video.paused) {
+        play.innerHTML = '<i class="fa fa-play fa-2x"></i>';
     } else {
-        showSuccess(input);
+        play.innerHTML = '<i class="fa fa-pause fa-2x"></i>';
     }
 }
 
-// Check passwords match
-function checkPasswordsMatch (input1, input2) {
-    if(input1.value !== input2.value) {
-        showError(input2, 'Passwords do not match');
+//Update progress & timestamp
+function updateProgress() {
+    progress.value = (video.currentTime / video.duration) * 100;
+
+
+    // Get Minutes
+    let mins = Math.floor(video.currentTime / 60);
+    if (mins < 10) {
+        mins = '0' + String(mins);
     }
+
+    // Get Seconds
+    let secs = Math.floor(video.currentTime % 60);
+    if(secs < 10) {
+        secs = '0' + String(secs);
+    }
+
+    timestamp.innerHTML = `${mins}:${secs}`;
 }
 
-
-// Get Field Name
-function getFieldName(input) {
-    return input.id.charAt(0).toUpperCase() + input.id.slice(1);
+// Set video time to progress
+function setVideoProgress() {
+    video.currentTime = (+progress.value * video.duration) / 100;
 }
+
+// Stop video
+function stopVideo() {
+    video.currentTime = 0;
+    video.pause();
+}
+
 
 // Event Listeners
-form.addEventListener('submit', function(e) {
-    e.preventDefault();
+video.addEventListener('click', toggleVideoStatus);
+video.addEventListener('pause', updatePlayIcon);
+video.addEventListener('play', updatePlayIcon);
+video.addEventListener('timeupdate', updateProgress);
 
-    checkRequired([username, email, password, password2]);
-    checkLength(username, 3, 15);
-    checkLength(password,  6, 25);
-    checkEmail(email);
-    checkPasswordsMatch(password, password2);
-});
+play.addEventListener('click', toggleVideoStatus);
 
+stop.addEventListener('click', stopVideo);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Before Refactor (Basic way to make this work)
-
-
-    /* if (username.value === '') {
-        showError(username, 'Username is required');
-    } else {
-        showSuccess(username);
-    }
-
-    if (email.value === '') {
-        showError(email, 'Email is required');
-    } else if (!isValidEmail(email.value)) {
-        showError(email, 'Email is not valid');
-    } else {
-        showSuccess(email);
-    }
-
-    if (password.value === '') {
-        showError(password, 'Password is required');
-    } else {
-        showSuccess(password);
-    }
-
-    if (password2.value === '') {
-        showError(password2, 'Confirmation is required');
-    } else {
-        showSuccess(password2);
-    }
-}); */
+progress.addEventListener('change', setVideoProgress);

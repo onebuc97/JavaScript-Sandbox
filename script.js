@@ -1,68 +1,120 @@
-const video = document.getElementById('video');
-const play = document.getElementById('play');
-const stop = document.getElementById('stop');
-const progress = document.getElementById('progress');
-const timestamp = document.getElementById('timestamp');
+const main = document.getElementById('main');
+const addUserBtn = document.getElementById('add-user');
+const doubleBtn = document.getElementById('double');
+const showMillionairesBtn = document.getElementById('show-millionaires');
+const sortBtn = document.getElementById('sort');
+const calculateWealthBtn = document.getElementById('calculate-wealth');
 
+let data = [];
 
-// Play & pause video
-function toggleVideoStatus() {
-    if(video.paused) {
-        video.play();
-    } else {
-        video.pause();
-    }
+getRandomUser();
+getRandomUser();
+getRandomUser();
+
+// Fetch random user and add money
+async function getRandomUser() {
+    const res = await fetch('https://randomuser.me/api');
+    const data = await res.json();
+
+    console.log(data);
+
+    const user = data.results[0];
+
+    const newUser = {
+        name: `${user.name.first} ${user.name.last}`, 
+        money: Math.floor(Math.random() * 1000000)
+    };
+    
+    addData(newUser);
 }
 
-// update play/pause icon
-function updatePlayIcon() {
-    if(video.paused) {
-        play.innerHTML = '<i class="fa fa-play fa-2x"></i>';
-    } else {
-        play.innerHTML = '<i class="fa fa-pause fa-2x"></i>';
-    }
+// Double Money
+function doubleMoney() {
+    data = data.map((user) => {
+        return{ ...user, money: user.money * 2 };
+    });
+
+    updateDOM();
 }
 
-//Update progress & timestamp
-function updateProgress() {
-    progress.value = (video.currentTime / video.duration) * 100;
+// Sort users by richest
 
+function sortByRichest() {
+    data.sort((a, b) => b.money - a.money);
 
-    // Get Minutes
-    let mins = Math.floor(video.currentTime / 60);
-    if (mins < 10) {
-        mins = '0' + String(mins);
-    }
-
-    // Get Seconds
-    let secs = Math.floor(video.currentTime % 60);
-    if(secs < 10) {
-        secs = '0' + String(secs);
-    }
-
-    timestamp.innerHTML = `${mins}:${secs}`;
+    updateDOM(); 
 }
 
-// Set video time to progress
-function setVideoProgress() {
-    video.currentTime = (+progress.value * video.duration) / 100;
+// Filter only millionaires
+function showMillionaires() {
+    data = data.filter(user => user.money > 1000000);
+
+    updateDOM();
 }
 
-// Stop video
-function stopVideo() {
-    video.currentTime = 0;
-    video.pause();
+// Calculate wealth
+function calculateWealth() {
+    const wealth = data.reduce((acc, user) => (acc += user.money), 0);
+
+    const wealthEl = document.createElement('div');
+    wealthEl.innerHTML = `<h3>Total Wealth: <strong>${formatMoney(wealth)}</strong></h3>`;
+    main.appendChild(wealthEl);
+}
+
+// Add new obj to data arr
+function addData(obj) {
+    data.push(obj);
+
+    updateDOM();
+}
+
+// Update DOM
+function updateDOM(providedData = data) {
+    // Clear main div
+    main.innerHTML = '<h2><strong>Person</strong> Wealth</h2>';
+
+    providedData.forEach(item => {
+        const element = document.createElement('div');
+        element.classList.add('person');
+        element.innerHTML = `<strong>${item.name}</strong> ${formatMoney(item.money)}`;
+        main.appendChild(element);
+    });
+}
+
+// Format number as money
+function formatMoney(number) {
+    return '$' + number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
 
-// Event Listeners
-video.addEventListener('click', toggleVideoStatus);
-video.addEventListener('pause', updatePlayIcon);
-video.addEventListener('play', updatePlayIcon);
-video.addEventListener('timeupdate', updateProgress);
+// Event Listeners 
+// Add User Listener only works because getRandomUser is set up
+addUserBtn.addEventListener('click', getRandomUser);
+doubleBtn.addEventListener('click', doubleMoney);
+sortBtn.addEventListener('click', sortByRichest);
+showMillionairesBtn.addEventListener('click', showMillionaires);
+calculateWealthBtn.addEventListener('click', calculateWealth);
 
-play.addEventListener('click', toggleVideoStatus);
 
-stop.addEventListener('click', stopVideo);
 
-progress.addEventListener('change', setVideoProgress);
+
+
+
+
+
+
+/*function getRandomUser() {
+    fetch("https://random-user.p.rapidapi.com/getuser", {
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-key": "undefined",
+		"x-rapidapi-host": "random-user.p.rapidapi.com"
+	}
+})
+.then(response => {
+	console.log(response);
+})
+.catch(err => {
+    console.error(err);
+});
+}*/

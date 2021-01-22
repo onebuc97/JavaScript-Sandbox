@@ -10,3 +10,5 @@ None of these projects have any sort of back-end functionality.
 
 3. Custom Video Player - Custom designed video player built with vanilla JavaScript for play, pause, stop, timestamp, and progress functionality.
                     index.html, video.js, style.css, progress.css
+                    
+4. DOM Array Methods Calculator - Interface for manipulating personal finance data with array methods and DOM selectors.

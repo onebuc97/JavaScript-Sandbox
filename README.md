@@ -12,3 +12,5 @@ None of these projects have any sort of back-end functionality.
                     index.html, video.js, style.css, progress.css
                     
 4. DOM Array Methods Calculator - Interface for manipulating personal finance data with array methods and DOM selectors.
+
+5. Landing Page - Simple HTML/CSS page with a modal and sliding navbar.
